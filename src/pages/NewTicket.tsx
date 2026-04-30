@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTickets } from '../context/TicketContext';
 import type { TicketPriority } from '../types';
-import { Save, X, Paperclip, AlertCircle } from 'lucide-react';
+import { Save, X, Paperclip } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const NewTicket = () => {

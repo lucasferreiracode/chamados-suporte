@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Bell, Moon, Sun } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Bell, Sun } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 

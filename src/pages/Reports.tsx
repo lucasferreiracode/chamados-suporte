@@ -1,6 +1,5 @@
-import React from 'react';
 import { useTickets } from '../context/TicketContext';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { FileText, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 

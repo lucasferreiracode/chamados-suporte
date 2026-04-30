@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { Ticket, TicketContextType, TicketStatus } from '../types';
 import { differenceInHours } from 'date-fns';
 
@@ -56,6 +56,7 @@ export const TicketProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTickets = () => {
   const context = useContext(TicketContext);
   if (context === undefined) {

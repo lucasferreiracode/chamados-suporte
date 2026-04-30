@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { useTickets } from '../context/TicketContext';
 import { format, differenceInHours, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Search, Filter, MoreVertical, Eye, Play, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { Search, Eye, Play, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const TicketList = () => {
   const { tickets, updateStatus, closeTicket } = useTickets();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('Todos');
-  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   
   // Modal State
   const [isFinishModalOpen, setIsFinishModalOpen] = useState(false);
