@@ -1,13 +1,27 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { Ticket, TicketContextType, TicketStatus } from '../types';
 import { differenceInHours } from 'date-fns';
 
-const MOCK_TICKETS: Ticket[] = [];
+const STORAGE_KEY = 'helpdesk_tickets';
 
 const TicketContext = createContext<TicketContextType | undefined>(undefined);
 
 export const TicketProvider = ({ children }: { children: ReactNode }) => {
-  const [tickets, setTickets] = useState<Ticket[]>(MOCK_TICKETS);
+  const [tickets, setTickets] = useState<Ticket[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse tickets from local storage', e);
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+  }, [tickets]);
 
   const addTicket = (newTicketData: Omit<Ticket, 'id' | 'createdAt' | 'status'>) => {
     const newId = `TCK-${1000 + tickets.length + 1}`;

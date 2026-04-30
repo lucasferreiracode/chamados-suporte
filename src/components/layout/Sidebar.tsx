@@ -58,11 +58,11 @@ export const Sidebar = () => {
       </div>
 
       <div className="p-4 border-t border-dark-600/50">
-        <button className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-dark-700 transition-all">
+        <button onClick={() => alert("Recurso em desenvolvimento!")} className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-dark-700 transition-all">
           <Settings className="w-5 h-5 text-gray-500" />
           Configurações
         </button>
-        <button className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-dark-700 transition-all mt-1">
+        <button onClick={() => alert("Recurso em desenvolvimento!")} className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-gray-400 hover:text-gray-200 hover:bg-dark-700 transition-all mt-1">
           <HelpCircle className="w-5 h-5 text-gray-500" />
           Suporte ao Sistema
         </button>

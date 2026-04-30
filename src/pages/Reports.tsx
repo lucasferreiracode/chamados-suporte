@@ -2,22 +2,27 @@ import { useTickets } from '../context/TicketContext';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { FileText, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { isSameMonth, parseISO, isSameWeek, getDay } from 'date-fns';
 
 export const Reports = () => {
   const { tickets } = useTickets();
 
-  // Aggregate mock data based on tickets context or static values
+  const now = new Date();
+  
   const closedTickets = tickets.filter(t => t.status === 'Finalizado');
+  const closedThisMonth = closedTickets.filter(t => t.closedAt && isSameMonth(parseISO(t.closedAt), now));
+  
   const slaMetCount = closedTickets.filter(t => t.slaMet).length;
   const slaPercentage = closedTickets.length > 0 ? Math.round((slaMetCount / closedTickets.length) * 100) : 100;
 
-  const data = [
-    { name: 'Seg', chamados: 0 },
-    { name: 'Ter', chamados: 0 },
-    { name: 'Qua', chamados: 0 },
-    { name: 'Qui', chamados: 0 },
-    { name: 'Sex', chamados: 0 },
-  ];
+  const totalTimeSpent = closedTickets.reduce((acc, t) => acc + (t.timeSpentMinutes || 0), 0);
+  const avgTimeSpent = closedTickets.length > 0 ? Math.round(totalTimeSpent / closedTickets.length) : 0;
+  const avgTimeFormatted = `${Math.floor(avgTimeSpent / 60)}h ${(avgTimeSpent % 60).toString().padStart(2, '0')}m`;
+
+  const data = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'].map((dayName, index) => {
+    const dayTickets = tickets.filter(t => isSameWeek(parseISO(t.createdAt), now, { weekStartsOn: 1 }) && getDay(parseISO(t.createdAt)) === index + 1);
+    return { name: dayName, chamados: dayTickets.length };
+  });
 
   return (
     <div className="space-y-6 pb-12">
@@ -35,8 +40,8 @@ export const Reports = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-panel p-6">
           <h3 className="text-gray-400 font-medium mb-2">Total Resolvidos (Mês)</h3>
-          <div className="text-3xl font-bold text-white mb-2">{closedTickets.length}</div>
-          <p className="text-gray-500 text-sm flex items-center gap-1">Aguardando dados</p>
+          <div className="text-3xl font-bold text-white mb-2">{closedThisMonth.length}</div>
+          <p className="text-gray-500 text-sm flex items-center gap-1">Em tempo real</p>
         </motion.div>
         
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-panel p-6">
@@ -49,7 +54,7 @@ export const Reports = () => {
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-panel p-6 border-l-4 border-primary">
           <h3 className="text-gray-400 font-medium mb-2">Tempo Médio Resolução</h3>
-          <div className="text-3xl font-bold text-white mb-2">0h 00m</div>
+          <div className="text-3xl font-bold text-white mb-2">{avgTimeFormatted}</div>
           <p className="text-primary text-sm flex items-center gap-1">Meta: 2h 00m</p>
         </motion.div>
       </div>

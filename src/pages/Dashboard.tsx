@@ -8,6 +8,7 @@ import {
   PieChart, Pie, Cell, LineChart, Line, Legend
 } from 'recharts';
 import { useTickets } from '../context/TicketContext';
+import { isSameMonth, parseISO, isSameWeek, getDay } from 'date-fns';
 
 export const Dashboard = () => {
   const { tickets } = useTickets();
@@ -17,7 +18,14 @@ export const Dashboard = () => {
   const finalizados = tickets.filter(t => t.status === 'Finalizado').length;
   const slaCritico = tickets.filter(t => t.status !== 'Finalizado' && t.priority === 'Crítica').length;
   
-  // Mocks for charts
+  const now = new Date();
+  
+  const ticketsNoMes = tickets.filter(t => isSameMonth(parseISO(t.createdAt), now));
+  const closedTickets = tickets.filter(t => t.status === 'Finalizado');
+  const totalTimeSpent = closedTickets.reduce((acc, t) => acc + (t.timeSpentMinutes || 0), 0);
+  const avgTimeSpent = closedTickets.length > 0 ? Math.round(totalTimeSpent / closedTickets.length) : 0;
+  const avgTimeFormatted = `${Math.floor(avgTimeSpent / 60)}h ${(avgTimeSpent % 60).toString().padStart(2, '0')}m`;
+
   const statusData = [
     { name: 'Aberto', value: totalAbertos, color: '#3B82F6' },
     { name: 'Em Atend.', value: emAtendimento, color: '#F59E0B' },
@@ -25,20 +33,24 @@ export const Dashboard = () => {
     { name: 'Escalado N2', value: tickets.filter(t => t.status === 'Escalado N2').length, color: '#EF4444' },
   ];
 
-  const analystData = [
-    { name: 'Carlos M.', chamados: 0 },
-    { name: 'Ana P.', chamados: 0 },
-    { name: 'Marcos S.', chamados: 0 },
-    { name: 'Julia R.', chamados: 0 },
-  ];
+  const analysts = Array.from(new Set(tickets.map(t => t.assignedTo).filter(Boolean)));
+  const analystData = analysts.map(name => ({
+    name: name?.split(' ')[0] + ' ' + (name?.split(' ')[1]?.[0] || '') + '.',
+    chamados: tickets.filter(t => t.assignedTo === name && (t.status === 'Em Atendimento' || t.status === 'Escalado N2')).length
+  })).filter(a => a.chamados > 0);
 
-  const productivityData = [
-    { name: 'Seg', resolvidos: 0, abertos: 0 },
-    { name: 'Ter', resolvidos: 0, abertos: 0 },
-    { name: 'Qua', resolvidos: 0, abertos: 0 },
-    { name: 'Qui', resolvidos: 0, abertos: 0 },
-    { name: 'Sex', resolvidos: 0, abertos: 0 },
-  ];
+  if (analystData.length === 0) {
+    analystData.push({ name: 'Nenhum', chamados: 0 });
+  }
+
+  const productivityData = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'].map((dayName, index) => {
+    // getDay() returns 0 for Sun, 1 for Mon, etc. index 0 is Mon -> getDay = 1.
+    const dayTickets = tickets.filter(t => isSameWeek(parseISO(t.createdAt), now, { weekStartsOn: 1 }));
+    const resolvidos = dayTickets.filter(t => t.status === 'Finalizado' && t.closedAt && getDay(parseISO(t.closedAt)) === index + 1).length;
+    const abertos = dayTickets.filter(t => getDay(parseISO(t.createdAt)) === index + 1).length;
+    
+    return { name: dayName, resolvidos, abertos };
+  });
 
   const StatCard = ({ title, value, icon: Icon, colorClass, delay }: any) => (
     <motion.div 
@@ -79,8 +91,8 @@ export const Dashboard = () => {
         <StatCard title="Em Atendimento" value={emAtendimento} icon={Clock} colorClass={{ bg: 'bg-warning', text: 'text-warning', shadow: 'shadow-[0_0_15px_rgba(245,158,11,0.5)]' }} delay={0.2} />
         <StatCard title="Finalizados" value={finalizados} icon={CheckCircle} colorClass={{ bg: 'bg-success', text: 'text-success', shadow: 'shadow-[0_0_15px_rgba(16,185,129,0.5)]' }} delay={0.3} />
         <StatCard title="SLA Crítico" value={slaCritico} icon={AlertTriangle} colorClass={{ bg: 'bg-danger', text: 'text-danger', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.5)]' }} delay={0.4} />
-        <StatCard title="Tempo Médio" value="0h 00m" icon={TrendingUp} colorClass={{ bg: 'bg-accent', text: 'text-accent', shadow: 'shadow-neon-accent' }} delay={0.5} />
-        <StatCard title="Demandas (Mês)" value="0" icon={BarChart3} colorClass={{ bg: 'bg-purple-500', text: 'text-purple-400', shadow: 'shadow-[0_0_15px_rgba(168,85,247,0.5)]' }} delay={0.6} />
+        <StatCard title="Tempo Médio" value={avgTimeFormatted} icon={TrendingUp} colorClass={{ bg: 'bg-accent', text: 'text-accent', shadow: 'shadow-neon-accent' }} delay={0.5} />
+        <StatCard title="Demandas (Mês)" value={ticketsNoMes.length.toString()} icon={BarChart3} colorClass={{ bg: 'bg-purple-500', text: 'text-purple-400', shadow: 'shadow-[0_0_15px_rgba(168,85,247,0.5)]' }} delay={0.6} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

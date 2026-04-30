@@ -8,11 +8,24 @@ export default {
   theme: {
     extend: {
       colors: {
+        white: 'rgb(var(--text-main) / <alpha-value>)',
+        gray: {
+          200: 'rgb(var(--text-gray-200) / <alpha-value>)',
+          300: 'rgb(var(--text-gray-300) / <alpha-value>)',
+          400: 'rgb(var(--text-gray-400) / <alpha-value>)',
+          500: 'rgb(var(--text-gray-500) / <alpha-value>)',
+          // Default colors for the rest
+          100: '#f3f4f6',
+          600: '#4b5563',
+          700: '#374151',
+          800: '#1f2937',
+          900: '#111827',
+        },
         dark: {
-          900: '#0B0F19', // Fundo principal
-          800: '#131A2A', // Cards e Sidebar
-          700: '#1C263A', // Hover em cards
-          600: '#2A364F', // Bordas sutis
+          900: 'rgb(var(--bg-dark-900) / <alpha-value>)',
+          800: 'rgb(var(--bg-dark-800) / <alpha-value>)',
+          700: 'rgb(var(--bg-dark-700) / <alpha-value>)',
+          600: 'rgb(var(--border-dark-600) / <alpha-value>)',
         },
         primary: {
           DEFAULT: '#3B82F6', // Azul principal

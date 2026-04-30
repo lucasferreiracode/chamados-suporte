@@ -4,6 +4,32 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-dark-900: 243 244 246;
+  --bg-dark-800: 255 255 255;
+  --bg-dark-700: 249 250 251;
+  --border-dark-600: 229 231 235;
+
+  --text-main: 17 24 39;
+  --text-gray-200: 55 65 81;
+  --text-gray-300: 75 85 99;
+  --text-gray-400: 107 114 128;
+  --text-gray-500: 156 163 175;
+}
+
+.dark {
+  --bg-dark-900: 11 15 25;
+  --bg-dark-800: 19 26 42;
+  --bg-dark-700: 28 38 58;
+  --border-dark-600: 42 54 79;
+
+  --text-main: 255 255 255;
+  --text-gray-200: 229 231 235;
+  --text-gray-300: 209 213 219;
+  --text-gray-400: 156 163 175;
+  --text-gray-500: 107 114 128;
+}
+
 @layer base {
   body {
     @apply bg-dark-900 text-gray-200 font-sans antialiased;
@@ -34,11 +60,11 @@
   }
   
   .btn-primary {
-    @apply bg-primary hover:bg-primary-hover text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:shadow-neon flex items-center justify-center gap-2;
+    @apply bg-primary hover:bg-primary-hover text-[#fff] font-medium py-2 px-4 rounded-lg transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:shadow-neon flex items-center justify-center gap-2;
   }
   
   .btn-secondary {
-    @apply bg-dark-700 hover:bg-dark-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 border border-dark-600 flex items-center justify-center gap-2;
+    @apply bg-dark-700 hover:bg-dark-600 text-gray-200 font-medium py-2 px-4 rounded-lg transition-all duration-300 border border-dark-600 flex items-center justify-center gap-2;
   }
 
   .input-field {
