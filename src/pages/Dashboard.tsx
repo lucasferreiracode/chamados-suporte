@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Ticket, Clock, CheckCircle2, AlertTriangle, 
+  Ticket, Clock, CheckCircle, AlertTriangle, 
   TrendingUp, CalendarSync 
 } from 'lucide-react';
 import { 
@@ -78,7 +78,7 @@ export const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <StatCard title="Abertos Hoje" value={totalAbertos} icon={Ticket} colorClass={{ bg: 'bg-primary', text: 'text-primary', shadow: 'shadow-neon' }} delay={0.1} />
         <StatCard title="Em Atendimento" value={emAtendimento} icon={Clock} colorClass={{ bg: 'bg-warning', text: 'text-warning', shadow: 'shadow-[0_0_15px_rgba(245,158,11,0.5)]' }} delay={0.2} />
-        <StatCard title="Finalizados" value={finalizados} icon={CheckCircle2} colorClass={{ bg: 'bg-success', text: 'text-success', shadow: 'shadow-[0_0_15px_rgba(16,185,129,0.5)]' }} delay={0.3} />
+        <StatCard title="Finalizados" value={finalizados} icon={CheckCircle} colorClass={{ bg: 'bg-success', text: 'text-success', shadow: 'shadow-[0_0_15px_rgba(16,185,129,0.5)]' }} delay={0.3} />
         <StatCard title="SLA Crítico" value={slaCritico} icon={AlertTriangle} colorClass={{ bg: 'bg-danger', text: 'text-danger', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.5)]' }} delay={0.4} />
         <StatCard title="Tempo Médio" value="2h 15m" icon={TrendingUp} colorClass={{ bg: 'bg-accent', text: 'text-accent', shadow: 'shadow-neon-accent' }} delay={0.5} />
         <StatCard title="Demandas (Mês)" value="142" icon={BarChart3} colorClass={{ bg: 'bg-purple-500', text: 'text-purple-400', shadow: 'shadow-[0_0_15px_rgba(168,85,247,0.5)]' }} delay={0.6} />
