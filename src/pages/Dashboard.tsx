@@ -134,7 +134,7 @@ export const Dashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={statusData}
+                  data={statusData.some(d => d.value > 0) ? statusData : [{ name: 'Sem Dados', value: 1, color: '#374151' }]}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -143,7 +143,7 @@ export const Dashboard = () => {
                   dataKey="value"
                   stroke="none"
                 >
-                  {statusData.map((entry, index) => (
+                  {(statusData.some(d => d.value > 0) ? statusData : [{ name: 'Sem Dados', value: 1, color: '#374151' }]).map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>

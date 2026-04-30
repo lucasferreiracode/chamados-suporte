@@ -63,8 +63,12 @@ export const TicketProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
+  const deleteTicket = (id: string) => {
+    setTickets(prev => prev.filter(t => t.id !== id));
+  };
+
   return (
-    <TicketContext.Provider value={{ tickets, addTicket, updateStatus, closeTicket }}>
+    <TicketContext.Provider value={{ tickets, addTicket, updateStatus, closeTicket, deleteTicket }}>
       {children}
     </TicketContext.Provider>
   );

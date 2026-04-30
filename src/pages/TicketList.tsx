@@ -3,11 +3,11 @@ import { useSearchParams } from 'react-router-dom';
 import { useTickets } from '../context/TicketContext';
 import { format, differenceInHours, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Search, Eye, Play, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { Search, Eye, Play, CheckCircle, AlertCircle, Clock, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const TicketList = () => {
-  const { tickets, updateStatus, closeTicket } = useTickets();
+  const { tickets, updateStatus, closeTicket, deleteTicket } = useTickets();
   const [searchParams, setSearchParams] = useSearchParams();
   
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
@@ -36,6 +36,8 @@ export const TicketList = () => {
   const [ticketToFinish, setTicketToFinish] = useState<string | null>(null);
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [timeSpent, setTimeSpent] = useState('');
+  
+  const [ticketDetails, setTicketDetails] = useState<any | null>(null);
 
   const filteredTickets = tickets.filter(t => {
     const matchesSearch = t.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -73,6 +75,12 @@ export const TicketList = () => {
       setIsFinishModalOpen(false);
       setResolutionNotes('');
       setTimeSpent('');
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm(`Tem certeza que deseja excluir o chamado ${id}?\n\nEssa ação não poderá ser desfeita.`)) {
+      deleteTicket(id);
     }
   };
 
@@ -187,13 +195,19 @@ export const TicketList = () => {
                     </td>
                     <td className="px-6 py-4 text-right relative">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-1.5 text-gray-400 hover:text-white bg-dark-800 hover:bg-dark-600 rounded transition-colors" title="Ver Detalhes">
+                        <button onClick={() => handleDelete(ticket.id)} className="p-1.5 text-danger hover:text-white bg-danger/10 hover:bg-danger rounded transition-colors" title="Excluir Chamado">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setTicketDetails(ticket)} className="p-1.5 text-gray-400 hover:text-white bg-dark-800 hover:bg-dark-600 rounded transition-colors" title="Ver Detalhes">
                           <Eye className="w-4 h-4" />
                         </button>
                         
                         {ticket.status === 'Aberto' && (
                           <button 
-                            onClick={() => updateStatus(ticket.id, 'Em Atendimento', 'Lucas Ferreira')}
+                            onClick={() => {
+                              const assignees = JSON.parse(localStorage.getItem('helpdesk_assignees') || '["Lucas Ferreira"]');
+                              updateStatus(ticket.id, 'Em Atendimento', assignees[0]);
+                            }}
                             className="p-1.5 text-blue-400 hover:text-white bg-blue-400/10 hover:bg-blue-500/80 rounded transition-colors" title="Iniciar Atendimento"
                           >
                             <Play className="w-4 h-4" />
@@ -286,6 +300,67 @@ export const TicketList = () => {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal de Detalhes */}
+      <AnimatePresence>
+        {ticketDetails && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="glass-panel w-full max-w-2xl overflow-hidden shadow-2xl shadow-primary/20 flex flex-col max-h-[90vh]"
+            >
+              <div className="px-6 py-4 border-b border-dark-600 flex justify-between items-center bg-dark-900/50 shrink-0">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  Detalhes do Chamado {ticketDetails.id}
+                </h3>
+                <button onClick={() => setTicketDetails(null)} className="text-gray-400 hover:text-white">
+                  <AlertCircle className="w-5 h-5 rotate-45" />
+                </button>
+              </div>
+              
+              <div className="p-6 overflow-y-auto space-y-4">
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Descrição do Problema</h4>
+                  <div className="p-4 bg-dark-900 rounded-lg text-gray-200 text-sm whitespace-pre-wrap border border-dark-600">
+                    {ticketDetails.description}
+                  </div>
+                </div>
+
+                {ticketDetails.attachment && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Anexo / Captura de Tela</h4>
+                    <div className="mt-2 border border-dark-600 rounded-lg overflow-hidden max-w-full bg-dark-900">
+                      <img src={ticketDetails.attachment} alt="Anexo do Chamado" className="max-w-full h-auto max-h-[300px] object-contain" />
+                    </div>
+                  </div>
+                )}
+
+                {ticketDetails.resolutionNotes && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Solução Aplicada</h4>
+                    <div className="p-4 bg-success/10 rounded-lg text-success text-sm whitespace-pre-wrap border border-success/20">
+                      {ticketDetails.resolutionNotes}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="px-6 py-4 border-t border-dark-600 bg-dark-900/50 shrink-0 flex justify-end">
+                <button onClick={() => setTicketDetails(null)} className="btn-secondary">
+                  Fechar
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

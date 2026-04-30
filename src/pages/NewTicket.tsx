@@ -10,6 +10,21 @@ export const NewTicket = () => {
   const { addTicket } = useTickets();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [categories, setCategories] = useState<string[]>(() => {
+    const saved = localStorage.getItem('helpdesk_categories');
+    return saved ? JSON.parse(saved) : ['Hardware', 'Software', 'Rede', 'Acesso a Sistemas', 'Outros'];
+  });
+
+  const [requestTypes, setRequestTypes] = useState<string[]>(() => {
+    const saved = localStorage.getItem('helpdesk_types');
+    return saved ? JSON.parse(saved) : ['Incidente', 'Requisição', 'Dúvida', 'Melhoria'];
+  });
+
+  const [assignees, setAssignees] = useState<string[]>(() => {
+    const saved = localStorage.getItem('helpdesk_assignees');
+    return saved ? JSON.parse(saved) : ['Lucas Ferreira'];
+  });
+
   const [formData, setFormData] = useState({
     clientName: '',
     department: '',
@@ -20,11 +35,118 @@ export const NewTicket = () => {
     priority: 'Média' as TicketPriority,
     description: '',
     slaExpectedHours: 24,
-    assignedTo: ''
+    assignedTo: '',
+    attachment: '' as string,
   });
+
+  const handleAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert('O arquivo é muito grande. O limite é de 2MB para não sobrecarregar o navegador.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, attachment: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
+    if (name === 'requestType' && value === 'ADD_NEW') {
+      const newValue = window.prompt('Digite o novo Tipo de Solicitação:');
+      if (newValue && newValue.trim()) {
+        const trimmed = newValue.trim();
+        const updated = [...requestTypes, trimmed];
+        setRequestTypes(updated);
+        localStorage.setItem('helpdesk_types', JSON.stringify(updated));
+        setFormData(prev => ({ ...prev, requestType: trimmed }));
+      }
+      return;
+    }
+
+    if (name === 'requestType' && value === 'REMOVE_OLD') {
+      const typeList = requestTypes.map((t, i) => `${i + 1}. ${t}`).join('\n');
+      const toRemove = window.prompt(`Qual Tipo de Solicitação você deseja remover? Digite o NOME EXATO:\n\n${typeList}`);
+      if (toRemove && requestTypes.includes(toRemove.trim())) {
+        if (requestTypes.length <= 1) {
+          alert('Você precisa ter pelo menos um Tipo de Solicitação.');
+          return;
+        }
+        const updated = requestTypes.filter(t => t !== toRemove.trim());
+        setRequestTypes(updated);
+        localStorage.setItem('helpdesk_types', JSON.stringify(updated));
+        setFormData(prev => ({ ...prev, requestType: updated[0] }));
+      } else if (toRemove) {
+        alert('Tipo de Solicitação não encontrado. Digite o nome exato.');
+      }
+      return;
+    }
+
+    if (name === 'category' && value === 'ADD_NEW') {
+      const newValue = window.prompt('Digite a nova Categoria:');
+      if (newValue && newValue.trim()) {
+        const trimmed = newValue.trim();
+        const updated = [...categories, trimmed];
+        setCategories(updated);
+        localStorage.setItem('helpdesk_categories', JSON.stringify(updated));
+        setFormData(prev => ({ ...prev, category: trimmed }));
+      }
+      return;
+    }
+
+    if (name === 'category' && value === 'REMOVE_OLD') {
+      const catList = categories.map((c, i) => `${i + 1}. ${c}`).join('\n');
+      const toRemove = window.prompt(`Qual Categoria você deseja remover? Digite o NOME EXATO:\n\n${catList}`);
+      if (toRemove && categories.includes(toRemove.trim())) {
+        if (categories.length <= 1) {
+          alert('Você precisa ter pelo menos uma Categoria.');
+          return;
+        }
+        const updated = categories.filter(c => c !== toRemove.trim());
+        setCategories(updated);
+        localStorage.setItem('helpdesk_categories', JSON.stringify(updated));
+        setFormData(prev => ({ ...prev, category: updated[0] }));
+      } else if (toRemove) {
+        alert('Categoria não encontrada. Digite o nome exato.');
+      }
+      return;
+    }
+
+    if (name === 'assignedTo' && value === 'ADD_NEW') {
+      const newValue = window.prompt('Digite o nome do novo Analista/Pessoa:');
+      if (newValue && newValue.trim()) {
+        const trimmed = newValue.trim();
+        const updated = [...assignees, trimmed];
+        setAssignees(updated);
+        localStorage.setItem('helpdesk_assignees', JSON.stringify(updated));
+        setFormData(prev => ({ ...prev, assignedTo: trimmed }));
+      }
+      return;
+    }
+
+    if (name === 'assignedTo' && value === 'REMOVE_OLD') {
+      const assigneeList = assignees.map((a, i) => `${i + 1}. ${a}`).join('\n');
+      const toRemove = window.prompt(`Quem você deseja remover? Digite o NOME EXATO:\n\n${assigneeList}`);
+      if (toRemove && assignees.includes(toRemove.trim())) {
+        if (assignees.length <= 1) {
+          alert('Você precisa ter pelo menos uma pessoa na lista.');
+          return;
+        }
+        const updated = assignees.filter(a => a !== toRemove.trim());
+        setAssignees(updated);
+        localStorage.setItem('helpdesk_assignees', JSON.stringify(updated));
+        setFormData(prev => ({ ...prev, assignedTo: '' }));
+      } else if (toRemove) {
+        alert('Nome não encontrado. Digite exatamente como na lista.');
+      }
+      return;
+    }
+
     setFormData(prev => ({ 
       ...prev, 
       [name]: name === 'slaExpectedHours' ? Number(value) : value 
@@ -96,20 +218,21 @@ export const NewTicket = () => {
               <div>
                 <label className="label-text">Tipo de Solicitação *</label>
                 <select name="requestType" value={formData.requestType} onChange={handleChange} className="input-field appearance-none">
-                  <option>Incidente</option>
-                  <option>Requisição</option>
-                  <option>Dúvida</option>
-                  <option>Melhoria</option>
+                  {requestTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                  <option value="ADD_NEW" className="text-primary font-medium">+ Adicionar Novo Tipo</option>
+                  <option value="REMOVE_OLD" className="text-danger font-medium">- Remover Tipo Existente</option>
                 </select>
               </div>
               <div>
                 <label className="label-text">Categoria *</label>
                 <select name="category" value={formData.category} onChange={handleChange} className="input-field appearance-none">
-                  <option>Hardware</option>
-                  <option>Software</option>
-                  <option>Rede</option>
-                  <option>Acesso a Sistemas</option>
-                  <option>Outros</option>
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                  <option value="ADD_NEW" className="text-primary font-medium">+ Adicionar Nova Categoria</option>
+                  <option value="REMOVE_OLD" className="text-danger font-medium">- Remover Categoria Existente</option>
                 </select>
               </div>
               <div>
@@ -147,10 +270,11 @@ export const NewTicket = () => {
                 <label className="label-text">Atribuir a (Opcional)</label>
                 <select name="assignedTo" value={formData.assignedTo} onChange={handleChange} className="input-field appearance-none">
                   <option value="">Não atribuído (Fila geral)</option>
-                  <option value="Carlos Mendes">Carlos Mendes</option>
-                  <option value="Ana Paula">Ana Paula</option>
-                  <option value="Marcos Silva">Marcos Silva</option>
-                  <option value="Lucas Ferreira">Lucas Ferreira</option>
+                  {assignees.map(a => (
+                    <option key={a} value={a}>{a}</option>
+                  ))}
+                  <option value="ADD_NEW" className="text-primary font-medium">+ Adicionar Nova Pessoa</option>
+                  <option value="REMOVE_OLD" className="text-danger font-medium">- Remover Pessoa</option>
                 </select>
               </div>
               <div>
@@ -160,10 +284,23 @@ export const NewTicket = () => {
             </div>
 
             <div className="flex items-center gap-2 mt-2">
-              <button type="button" className="text-primary hover:text-primary-neon text-sm font-medium flex items-center gap-2 transition-colors">
+              <label htmlFor="file-upload" className="text-primary hover:text-primary-neon text-sm font-medium flex items-center gap-2 transition-colors cursor-pointer">
                 <Paperclip className="w-4 h-4" />
                 Anexar Arquivos ou Capturas de Tela
-              </button>
+              </label>
+              <input 
+                id="file-upload" 
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleAttachment} 
+              />
+              {formData.attachment && (
+                <span className="text-xs text-green-400 flex items-center gap-1 ml-2 bg-green-400/10 px-2 py-1 rounded">
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                  Imagem Anexada
+                </span>
+              )}
             </div>
           </div>
         </div>

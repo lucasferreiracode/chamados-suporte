@@ -21,6 +21,9 @@ export interface Ticket {
   timeSpentMinutes?: number;
   closedAt?: string; // ISO String
   slaMet?: boolean;
+  
+  // Attachments
+  attachment?: string; // base64
 }
 
 export interface TicketContextType {
@@ -28,4 +31,5 @@ export interface TicketContextType {
   addTicket: (ticket: Omit<Ticket, 'id' | 'createdAt' | 'status'>) => void;
   updateStatus: (id: string, status: TicketStatus, assignedTo?: string) => void;
   closeTicket: (id: string, resolutionNotes: string, timeSpentMinutes: number) => void;
+  deleteTicket: (id: string) => void;
 }
