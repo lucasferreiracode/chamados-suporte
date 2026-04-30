@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTickets } from '../context/TicketContext';
-import { TicketPriority } from '../types';
+import type { TicketPriority } from '../types';
 import { Save, X, Paperclip, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 

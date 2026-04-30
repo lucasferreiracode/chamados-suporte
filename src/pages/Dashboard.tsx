@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   Ticket, Clock, CheckCircle, AlertTriangle, 
-  TrendingUp, CalendarSync 
+  TrendingUp, CalendarSync, BarChart3 
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -27,18 +27,18 @@ export const Dashboard = () => {
   ];
 
   const analystData = [
-    { name: 'Carlos M.', chamados: 5 },
-    { name: 'Ana P.', chamados: 8 },
-    { name: 'Marcos S.', chamados: 3 },
-    { name: 'Julia R.', chamados: 6 },
+    { name: 'Carlos M.', chamados: 0 },
+    { name: 'Ana P.', chamados: 0 },
+    { name: 'Marcos S.', chamados: 0 },
+    { name: 'Julia R.', chamados: 0 },
   ];
 
   const productivityData = [
-    { name: 'Seg', resolvidos: 12, abertos: 15 },
-    { name: 'Ter', resolvidos: 19, abertos: 10 },
-    { name: 'Qua', resolvidos: 15, abertos: 18 },
-    { name: 'Qui', resolvidos: 22, abertos: 14 },
-    { name: 'Sex', resolvidos: 28, abertos: 20 },
+    { name: 'Seg', resolvidos: 0, abertos: 0 },
+    { name: 'Ter', resolvidos: 0, abertos: 0 },
+    { name: 'Qua', resolvidos: 0, abertos: 0 },
+    { name: 'Qui', resolvidos: 0, abertos: 0 },
+    { name: 'Sex', resolvidos: 0, abertos: 0 },
   ];
 
   const StatCard = ({ title, value, icon: Icon, colorClass, delay }: any) => (
@@ -80,8 +80,8 @@ export const Dashboard = () => {
         <StatCard title="Em Atendimento" value={emAtendimento} icon={Clock} colorClass={{ bg: 'bg-warning', text: 'text-warning', shadow: 'shadow-[0_0_15px_rgba(245,158,11,0.5)]' }} delay={0.2} />
         <StatCard title="Finalizados" value={finalizados} icon={CheckCircle} colorClass={{ bg: 'bg-success', text: 'text-success', shadow: 'shadow-[0_0_15px_rgba(16,185,129,0.5)]' }} delay={0.3} />
         <StatCard title="SLA Crítico" value={slaCritico} icon={AlertTriangle} colorClass={{ bg: 'bg-danger', text: 'text-danger', shadow: 'shadow-[0_0_15px_rgba(239,68,68,0.5)]' }} delay={0.4} />
-        <StatCard title="Tempo Médio" value="2h 15m" icon={TrendingUp} colorClass={{ bg: 'bg-accent', text: 'text-accent', shadow: 'shadow-neon-accent' }} delay={0.5} />
-        <StatCard title="Demandas (Mês)" value="142" icon={BarChart3} colorClass={{ bg: 'bg-purple-500', text: 'text-purple-400', shadow: 'shadow-[0_0_15px_rgba(168,85,247,0.5)]' }} delay={0.6} />
+        <StatCard title="Tempo Médio" value="0h 00m" icon={TrendingUp} colorClass={{ bg: 'bg-accent', text: 'text-accent', shadow: 'shadow-neon-accent' }} delay={0.5} />
+        <StatCard title="Demandas (Mês)" value="0" icon={BarChart3} colorClass={{ bg: 'bg-purple-500', text: 'text-purple-400', shadow: 'shadow-[0_0_15px_rgba(168,85,247,0.5)]' }} delay={0.6} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -104,8 +104,8 @@ export const Dashboard = () => {
                   itemStyle={{ color: '#E5E7EB' }}
                 />
                 <Legend />
-                <Line type="monotone" dataKey="resolvidos" name="Resolvidos" stroke="#10B981" strokeWidth={3} dot={{ r: 4, fill: '#10B981' }} activeDot={{ r: 6, shadow: '0 0 10px #10B981' }} />
-                <Line type="monotone" dataKey="abertos" name="Abertos" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4, fill: '#3B82F6' }} activeDot={{ r: 6, shadow: '0 0 10px #3B82F6' }} />
+                <Line type="monotone" dataKey="resolvidos" name="Resolvidos" stroke="#10B981" strokeWidth={3} dot={{ r: 4, fill: '#10B981' }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="abertos" name="Abertos" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4, fill: '#3B82F6' }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>

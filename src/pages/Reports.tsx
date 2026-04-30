@@ -13,11 +13,11 @@ export const Reports = () => {
   const slaPercentage = closedTickets.length > 0 ? Math.round((slaMetCount / closedTickets.length) * 100) : 100;
 
   const data = [
-    { name: 'Seg', chamados: 12 },
-    { name: 'Ter', chamados: 19 },
-    { name: 'Qua', chamados: 15 },
-    { name: 'Qui', chamados: 22 },
-    { name: 'Sex', chamados: 28 },
+    { name: 'Seg', chamados: 0 },
+    { name: 'Ter', chamados: 0 },
+    { name: 'Qua', chamados: 0 },
+    { name: 'Qui', chamados: 0 },
+    { name: 'Sex', chamados: 0 },
   ];
 
   return (
@@ -36,8 +36,8 @@ export const Reports = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-panel p-6">
           <h3 className="text-gray-400 font-medium mb-2">Total Resolvidos (Mês)</h3>
-          <div className="text-3xl font-bold text-white mb-2">{closedTickets.length * 12}</div>
-          <p className="text-success text-sm flex items-center gap-1">+14% comparado ao mês anterior</p>
+          <div className="text-3xl font-bold text-white mb-2">{closedTickets.length}</div>
+          <p className="text-gray-500 text-sm flex items-center gap-1">Aguardando dados</p>
         </motion.div>
         
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-panel p-6">
@@ -50,7 +50,7 @@ export const Reports = () => {
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-panel p-6 border-l-4 border-primary">
           <h3 className="text-gray-400 font-medium mb-2">Tempo Médio Resolução</h3>
-          <div className="text-3xl font-bold text-white mb-2">1h 45m</div>
+          <div className="text-3xl font-bold text-white mb-2">0h 00m</div>
           <p className="text-primary text-sm flex items-center gap-1">Meta: 2h 00m</p>
         </motion.div>
       </div>
