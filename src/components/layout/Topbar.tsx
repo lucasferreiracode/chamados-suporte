@@ -15,6 +15,37 @@ export const Topbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { tickets } = useTickets();
   const notifRef = useRef<HTMLDivElement>(null);
+  const [profilePic, setProfilePic] = useState<string | null>(localStorage.getItem('helpdesk_profile_pic'));
+
+  // Calcula o XP com base nos chamados
+  const closedTickets = tickets.filter(t => t.status === 'Finalizado').length;
+  const totalXP = (tickets.length * 10) + (closedTickets * 40); // 10 XP por criar, +40 XP por finalizar (total 50)
+  
+  const XP_PER_LEVEL = 500;
+  const currentLevel = Math.floor(totalXP / XP_PER_LEVEL) + 1;
+  const currentXPInLevel = totalXP % XP_PER_LEVEL;
+  const progressPercentage = (currentXPInLevel / XP_PER_LEVEL) * 100;
+
+  // Define o título baseado no nível
+  const getJobTitle = (level: number) => {
+    if (level < 3) return 'Analista Júnior';
+    if (level < 7) return 'Analista Pleno';
+    if (level < 15) return 'Analista Sênior';
+    return 'Especialista';
+  };
+
+  const handleProfileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setProfilePic(base64);
+        localStorage.setItem('helpdesk_profile_pic', base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Close notifications on click outside
   useEffect(() => {
@@ -125,17 +156,46 @@ export const Topbar = () => {
 
         <div className="h-8 w-px bg-dark-600/50 mx-2"></div>
 
-        <button onClick={showDevAlert} className="flex items-center gap-3 focus:outline-none">
-          <div className="text-right hidden sm:block">
+        <div className="flex items-center gap-3">
+          <div className="text-right hidden sm:flex flex-col items-end">
             <p className="text-sm font-medium text-gray-200 leading-none">Lucas Ferreira</p>
-            <p className="text-xs text-primary mt-1">Admin N2</p>
-          </div>
-          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-white font-bold shadow-neon p-0.5">
-            <div className="w-full h-full bg-dark-800 rounded-full flex items-center justify-center overflow-hidden">
-              <img src="https://ui-avatars.com/api/?name=Lucas+Ferreira&background=random&color=fff" alt="Avatar" className="w-full h-full object-cover" />
+            <div className="flex items-center gap-2 mt-1.5">
+               <span className="text-[10px] font-bold text-primary">Nível {currentLevel}</span>
+               <p className="text-xs text-primary">{getJobTitle(currentLevel)}</p>
+            </div>
+            {/* Progress */}
+            <div className="w-full flex justify-end items-center gap-2 mt-1" title={`Ganhe XP abrindo (+10) e resolvendo (+40) chamados.`}>
+               <span className="text-[9px] text-gray-400">{currentXPInLevel}/{XP_PER_LEVEL} XP</span>
+               <div className="h-1.5 w-16 bg-dark-700 rounded-full overflow-hidden">
+                 <div 
+                   className="h-full bg-primary rounded-full transition-all duration-1000 ease-out" 
+                   style={{ width: `${Math.max(progressPercentage, 2)}%` }}
+                 ></div>
+               </div>
             </div>
           </div>
-        </button>
+          
+          <div className="relative group cursor-pointer shrink-0">
+             <label htmlFor="topbar-profile-upload" className="cursor-pointer">
+               {/* Circular Progress Ring */}
+               <div className="relative w-11 h-11 rounded-full flex items-center justify-center p-0.5"
+                    style={{ background: `conic-gradient(var(--tw-gradient-stops))`, backgroundImage: `conic-gradient(from 0deg, #3b82f6 ${progressPercentage}%, #1f2937 ${progressPercentage}%)` }}
+               >
+                  <div className="w-full h-full bg-dark-800 rounded-full overflow-hidden border-2 border-dark-800 flex items-center justify-center relative z-10">
+                     {profilePic ? (
+                       <img src={profilePic} alt="Avatar" className="w-full h-full object-cover" />
+                     ) : (
+                       <span className="text-white text-sm font-bold">LF</span>
+                     )}
+                  </div>
+                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20 m-0.5">
+                     <span className="text-[9px] text-white">Editar</span>
+                  </div>
+               </div>
+             </label>
+             <input id="topbar-profile-upload" type="file" accept="image/*" className="hidden" onChange={handleProfileUpload} />
+          </div>
+        </div>
       </div>
     </header>
   );
