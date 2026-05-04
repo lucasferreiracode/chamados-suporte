@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { Ticket, TicketContextType, TicketStatus } from '../types';
 import { differenceInHours } from 'date-fns';
+import toast from 'react-hot-toast';
 
 const STORAGE_KEY = 'helpdesk_tickets';
 
@@ -32,6 +33,7 @@ export const TicketProvider = ({ children }: { children: ReactNode }) => {
       status: 'Aberto'
     };
     setTickets(prev => [newTicket, ...prev]);
+    toast.success(`Chamado ${newId} criado com sucesso!`);
   };
 
   const updateStatus = (id: string, status: TicketStatus, assignedTo?: string) => {
@@ -41,6 +43,7 @@ export const TicketProvider = ({ children }: { children: ReactNode }) => {
       }
       return t;
     }));
+    toast.success(`Status do chamado ${id} atualizado para ${status}.`);
   };
 
   const closeTicket = (id: string, resolutionNotes: string, timeSpentMinutes: number) => {
@@ -61,10 +64,12 @@ export const TicketProvider = ({ children }: { children: ReactNode }) => {
       }
       return t;
     }));
+    toast.success(`Chamado ${id} finalizado com sucesso!`);
   };
 
   const deleteTicket = (id: string) => {
-    setTickets(prev => prev.filter(t => t.id !== id));
+    setTickets(prev => prev.map(t => t).filter(t => t.id !== id));
+    toast.error(`Chamado ${id} excluído permanentemente.`);
   };
 
   return (

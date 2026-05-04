@@ -2,7 +2,8 @@ import { useTickets } from '../context/TicketContext';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { FileText, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { isSameMonth, parseISO, isSameWeek, getDay } from 'date-fns';
+import { isSameMonth, parseISO, isSameWeek, getDay, format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 export const Reports = () => {
   const { tickets } = useTickets();
@@ -24,6 +25,45 @@ export const Reports = () => {
     return { name: dayName, chamados: dayTickets.length };
   });
 
+  const handleExportCSV = () => {
+    if (tickets.length === 0) {
+      toast.error('Não há dados para exportar.');
+      return;
+    }
+
+    const headers = ['ID', 'Cliente', 'Empresa', 'Categoria', 'Prioridade', 'Status', 'SLA(h)', 'SLA Cumprido', 'Abertura', 'Fechamento', 'Tempo Gasto(m)'];
+    const csvRows = [headers.join(',')];
+
+    for (const t of tickets) {
+      const row = [
+        t.id,
+        `"${t.clientName}"`,
+        `"${t.company}"`,
+        `"${t.category}"`,
+        t.priority,
+        t.status,
+        t.slaExpectedHours,
+        t.status === 'Finalizado' ? (t.slaMet ? 'Sim' : 'Não') : '-',
+        format(parseISO(t.createdAt), 'dd/MM/yyyy HH:mm'),
+        t.closedAt ? format(parseISO(t.closedAt), 'dd/MM/yyyy HH:mm') : '-',
+        t.timeSpentMinutes || 0
+      ];
+      csvRows.push(row.join(','));
+    }
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `relatorio_chamados_${format(new Date(), 'yyyyMMdd_HHmm')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Relatório CSV exportado com sucesso!');
+  };
+
   return (
     <div className="space-y-6 pb-12">
       <div className="flex items-center justify-between">
@@ -31,10 +71,12 @@ export const Reports = () => {
           <h1 className="text-2xl font-bold text-white tracking-tight">Relatórios Gerenciais</h1>
           <p className="text-gray-400 text-sm mt-1">Análise de desempenho e métricas avançadas.</p>
         </div>
-        <button className="btn-secondary">
-          <Download className="w-4 h-4" />
-          Exportar PDF
-        </button>
+        <div className="flex gap-3">
+          <button onClick={handleExportCSV} className="btn-secondary">
+            <Download className="w-4 h-4" />
+            Exportar CSV
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

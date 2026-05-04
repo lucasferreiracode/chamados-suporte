@@ -6,6 +6,7 @@ import { Dashboard } from './pages/Dashboard';
 import { TicketList } from './pages/TicketList';
 import { NewTicket } from './pages/NewTicket';
 import { Reports } from './pages/Reports';
+import { Settings } from './pages/Settings';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
               <Route path="chamados" element={<TicketList />} />
               <Route path="novo-chamado" element={<NewTicket />} />
               <Route path="relatorios" element={<Reports />} />
+              <Route path="configuracoes" element={<Settings />} />
             </Route>
           </Routes>
         </BrowserRouter>
