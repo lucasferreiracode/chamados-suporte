@@ -1,0 +1,16 @@
+{
+  "name": "Chamados Suporte",
+  "short_name": "Chamados",
+  "description": "Sistema de gestão de chamados de suporte",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#863bff",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
